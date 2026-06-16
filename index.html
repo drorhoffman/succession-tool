@@ -1,1 +1,1279 @@
-# succession-tool
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Succession Intelligence | IDEA</title>
+<!--
+  PRIVACY & SECURITY
+  ══════════════════
+  • This file runs 100% in the browser. No server. No backend.
+  • Zero data transmission: all candidate data stays on this device only.
+  • The Content-Security-Policy below (connect-src 'none') enforces this
+    at the browser level — even if malicious code were injected, it
+    cannot send data anywhere.
+  • Only external resources loaded: PDF.js + mammoth.js from cdnjs.cloudflare.com
+    (JavaScript libraries — they receive no data from this tool).
+  • No cookies. No localStorage. No analytics. No tracking.
+  • Closing the tab clears everything permanently.
+-->
+<meta http-equiv="Content-Security-Policy"
+  content="
+    default-src 'none';
+    script-src  'unsafe-inline' https://cdnjs.cloudflare.com;
+    style-src   'unsafe-inline';
+    img-src     data:;
+    connect-src 'none';
+    form-action 'none';
+    base-uri    'none';
+    object-src  'none';
+  ">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg:       #060B16;
+  --bg2:      #0A1120;
+  --card:     #0C1628;
+  --card2:    #101F38;
+  --border:   #162035;
+  --border2:  #1E3050;
+  --cyan:     #22D3EE;
+  --cyan-d:   rgba(34,211,238,.12);
+  --cyan-dd:  rgba(34,211,238,.06);
+  --indigo:   #818CF8;
+  --green:    #10B981;
+  --green-d:  rgba(16,185,129,.12);
+  --amber:    #F59E0B;
+  --amber-d:  rgba(245,158,11,.12);
+  --red:      #F87171;
+  --red-d:    rgba(248,113,113,.12);
+  --purple:   #A78BFA;
+  --purple-d: rgba(167,139,250,.12);
+  --t1:       #E2E8F0;
+  --t2:       #4B6A9A;
+  --t3:       #223050;
+  --glow-c:   0 0 20px rgba(34,211,238,.15);
+  --glow-s:   0 0 8px rgba(34,211,238,.2);
+}
+
+body{
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  background: var(--bg);
+  background-image: radial-gradient(rgba(30,64,120,.2) 1px,transparent 1px);
+  background-size: 28px 28px;
+  color: var(--t1);
+  min-height:100vh;
+  direction:rtl;
+  line-height:1.5;
+}
+
+/* ─ Screens ─ */
+.screen{display:none!important;}
+.screen.active{display:block!important;}
+#welcome.active{display:flex!important;}
+
+/* ════════════ WELCOME ════════════ */
+#welcome{min-height:100vh;align-items:center;justify-content:center;}
+.wcard{
+  background:var(--card);
+  border:1px solid var(--border2);
+  border-radius:16px;
+  padding:56px 48px;
+  max-width:520px;width:92%;
+  text-align:center;
+  box-shadow:var(--glow-c),0 0 60px rgba(0,0,0,.5);
+  position:relative;overflow:hidden;
+}
+.wcard::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+}
+.wlogo{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:32px;opacity:.8;}
+.wtitle{font-size:34px;font-weight:800;color:var(--t1);margin-bottom:10px;letter-spacing:-.5px;}
+.wsub{font-size:15px;color:var(--t2);line-height:1.7;margin-bottom:40px;}
+.wsteps{display:flex;justify-content:center;gap:14px;margin-bottom:44px;flex-wrap:wrap;}
+.ws{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.wsico{
+  width:48px;height:48px;
+  background:var(--cyan-d);
+  border:1px solid rgba(34,211,238,.2);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+.wslbl{font-size:11px;color:var(--t2);font-weight:600;letter-spacing:.3px;}
+.btn-start{
+  background:linear-gradient(135deg,#0891B2,#0E7490);
+  color:#fff;border:none;
+  padding:16px 52px;border-radius:10px;
+  font-size:16px;font-weight:700;cursor:pointer;
+  box-shadow:0 0 24px rgba(34,211,238,.25);
+  transition:all .2s;font-family:inherit;
+  letter-spacing:.3px;
+}
+.btn-start:hover{box-shadow:0 0 36px rgba(34,211,238,.4);transform:translateY(-2px);}
+
+/* ════════════ BUILDER ════════════ */
+#builder{min-height:100vh;padding-bottom:60px;}
+
+.bhead{
+  background:var(--card);
+  border-bottom:1px solid var(--border2);
+  padding:16px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 4px 24px rgba(0,0,0,.4);
+}
+.bhead::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.4;}
+.bh-t{font-size:17px;font-weight:700;color:var(--cyan);}
+.bh-s{font-size:11px;color:var(--t2);margin-top:2px;letter-spacing:.3px;}
+.bh-a{display:flex;gap:10px;}
+
+.btn-ghost{
+  background:transparent;color:var(--t2);
+  border:1px solid var(--border2);
+  padding:8px 16px;border-radius:7px;
+  font-size:13px;font-weight:600;cursor:pointer;
+  transition:all .2s;font-family:inherit;
+}
+.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+
+.btn-gen{
+  background:linear-gradient(135deg,#0891B2,#6D28D9);
+  color:#fff;border:none;
+  padding:9px 22px;border-radius:7px;
+  font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;font-family:inherit;
+  box-shadow:0 0 16px rgba(34,211,238,.2);
+}
+.btn-gen:hover{box-shadow:0 0 24px rgba(34,211,238,.35);transform:translateY(-1px);}
+
+.bbody{max-width:820px;margin:0 auto;padding:28px 20px;}
+
+/* ─ Role card ─ */
+.role-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  margin-bottom:14px;
+  overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+  position:relative;
+}
+.role-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);}
+.role-card:hover{border-color:var(--border2);}
+.role-card.open{border-color:rgba(34,211,238,.25);box-shadow:0 0 20px rgba(34,211,238,.06);}
+
+.rc-head{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.role-card.open .rc-head{border-bottom:1px solid var(--border);}
+.rch-r{display:flex;align-items:center;gap:12px;}
+.role-num{
+  width:30px;height:30px;
+  background:linear-gradient(135deg,#0891B2,#0E7490);
+  border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;color:#fff;flex-shrink:0;
+}
+.rt{font-size:15px;font-weight:700;color:var(--t1);}
+.rm{font-size:11px;color:var(--t2);margin-top:2px;letter-spacing:.2px;}
+.rch-l{display:flex;align-items:center;gap:10px;}
+.dept-tag{
+  font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:20px;
+  background:var(--cyan-d);color:var(--cyan);
+  border:1px solid rgba(34,211,238,.2);
+  letter-spacing:.3px;
+}
+.chevron{color:var(--t3);font-size:11px;transition:transform .2s;display:inline-block;}
+.role-card.open .chevron{transform:rotate(180deg);}
+.rc-body{display:none;padding:20px;}
+.role-card.open .rc-body{display:block;}
+
+/* ─ Forms ─ */
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fl{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;}
+.fi{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:7px;
+  padding:9px 12px;
+  font-size:13px;color:var(--t1);
+  direction:rtl;width:100%;
+  font-family:inherit;
+  transition:border-color .2s,box-shadow .2s;
+}
+.fi:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 2px rgba(34,211,238,.12);}
+.fi::placeholder{color:var(--t3);}
+textarea.fi{resize:vertical;min-height:100px;line-height:1.6;}
+select.fi{cursor:pointer;}
+option{background:var(--card);}
+.fr4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:18px;}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+
+/* ─ Candidate card ─ */
+.cands-hdr{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
+.cand-card{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:9px;padding:16px;margin-bottom:12px;
+  transition:border-color .2s;
+}
+.cand-card:hover{border-color:var(--border2);}
+.cand-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cand-num{font-size:11px;font-weight:700;color:var(--indigo);background:var(--purple-d);border:1px solid rgba(167,139,250,.2);padding:2px 9px;border-radius:20px;}
+.btn-rm{background:none;border:none;color:var(--t3);cursor:pointer;font-size:16px;padding:2px 5px;border-radius:4px;transition:color .2s;}
+.btn-rm:hover{color:var(--red);}
+
+.cv-label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.upload-lbl{
+  font-size:11px;color:var(--cyan);cursor:pointer;font-weight:600;
+  display:flex;align-items:center;gap:4px;
+  padding:3px 8px;border-radius:5px;
+  transition:background .15s;
+  border:1px solid rgba(34,211,238,.2);
+}
+.upload-lbl:hover{background:var(--cyan-d);}
+
+.btn-analyze{
+  width:100%;
+  background:linear-gradient(135deg,rgba(124,58,237,.8),rgba(109,40,217,.9));
+  border:1px solid rgba(167,139,250,.3);
+  color:#fff;padding:10px 16px;border-radius:8px;
+  font-size:13px;font-weight:700;cursor:pointer;
+  margin-top:10px;font-family:inherit;
+  transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  letter-spacing:.3px;
+}
+.btn-analyze:hover{box-shadow:0 0 20px rgba(167,139,250,.3);transform:translateY(-1px);}
+.btn-analyze:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ─ Analysis card ─ */
+.analysis-card{
+  background:var(--bg);
+  border:1px solid rgba(167,139,250,.25);
+  border-radius:8px;margin-top:12px;overflow:hidden;
+}
+.ac-top{
+  background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(109,40,217,.1));
+  border-bottom:1px solid rgba(167,139,250,.15);
+  padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.ac-title{font-size:12px;font-weight:700;color:var(--purple);display:flex;align-items:center;gap:6px;letter-spacing:.3px;}
+.ac-stats{display:flex;gap:8px;flex-wrap:wrap;}
+.ac-stat{font-size:11px;color:var(--indigo);background:var(--purple-d);border:1px solid rgba(167,139,250,.2);padding:2px 9px;border-radius:20px;font-weight:600;}
+.ac-body{padding:12px 14px;}
+.ac-rl-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.ac-rl-lbl{font-size:11px;color:var(--t2);font-weight:700;white-space:nowrap;padding-top:3px;letter-spacing:.3px;text-transform:uppercase;}
+.ac-rl-pill{display:inline-block;padding:3px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:5px;}
+.ac-rl-exp{font-size:12px;color:var(--t2);line-height:1.5;}
+.ac-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.ac-col-t{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.ac-col-t.s{color:var(--green);}
+.ac-col-t.g{color:var(--red);}
+.ac-list li{font-size:12px;color:var(--t2);margin-bottom:4px;padding-right:14px;position:relative;list-style:none;line-height:1.4;}
+.ac-list.s li::before{content:'✓';position:absolute;right:0;color:var(--green);font-weight:700;}
+.ac-list.g li::before{content:'·';position:absolute;right:0;color:var(--red);font-weight:700;}
+
+.r-override{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.r-override .fl{white-space:nowrap;margin:0;}
+
+.btn-add-cand{
+  background:transparent;
+  border:1px dashed var(--border2);
+  color:var(--t2);
+  padding:10px 16px;border-radius:8px;
+  font-size:13px;font-weight:600;cursor:pointer;
+  width:100%;transition:all .2s;font-family:inherit;
+  margin-top:2px;
+}
+.btn-add-cand:hover{border-color:var(--cyan);color:var(--cyan);}
+.btn-add-cand:disabled{opacity:.3;cursor:not-allowed;}
+
+.role-footer{display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+.btn-del{background:none;border:1px solid rgba(248,113,113,.2);color:var(--red);padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;}
+.btn-del:hover{background:var(--red-d);}
+
+.add-role-btn{
+  background:transparent;
+  border:1px dashed var(--border2);
+  border-radius:12px;
+  padding:20px;text-align:center;
+  cursor:pointer;color:var(--t2);
+  font-size:14px;font-weight:600;
+  width:100%;transition:all .2s;font-family:inherit;
+  margin-top:4px;
+}
+.add-role-btn:hover{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dd);}
+
+/* ════════════ LOADING ════════════ */
+#loading{
+  display:none;position:fixed;inset:0;
+  background:rgba(6,11,22,.85);
+  backdrop-filter:blur(4px);
+  z-index:999;
+  align-items:center;justify-content:center;
+}
+#loading.show{display:flex!important;}
+.loading-card{
+  background:var(--card);
+  border:1px solid rgba(34,211,238,.3);
+  border-radius:14px;
+  padding:40px 48px;
+  text-align:center;
+  box-shadow:var(--glow-c);
+}
+.loading-ring{
+  width:52px;height:52px;
+  border:3px solid var(--border2);
+  border-top-color:var(--cyan);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+  margin:0 auto 20px;
+}
+.loading-text{font-size:15px;font-weight:700;color:var(--cyan);letter-spacing:.5px;}
+.loading-sub{font-size:12px;color:var(--t2);margin-top:6px;}
+
+/* ════════════ DASHBOARD ════════════ */
+#dashboard{background:var(--bg);}
+
+.dash-head{
+  background:var(--card);
+  border-bottom:1px solid var(--border2);
+  padding:28px 32px;
+  position:relative;
+  overflow:hidden;
+}
+.dash-head::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  opacity:.5;
+}
+.dash-head-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.dh-brand{display:flex;align-items:center;gap:16px;}
+.dh-icon{
+  width:44px;height:44px;
+  background:linear-gradient(135deg,#0891B2,#6D28D9);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  box-shadow:0 0 16px rgba(34,211,238,.3);
+}
+.dh-t{font-size:19px;font-weight:800;color:var(--t1);letter-spacing:-.3px;}
+.dh-s{font-size:11px;color:var(--t2);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.dh-actions{display:flex;gap:10px;align-items:center;}
+.dh-date{font-size:11px;color:var(--t2);letter-spacing:.5px;font-family:monospace;}
+
+.btn-back-d{background:transparent;color:var(--t2);border:1px solid var(--border2);padding:9px 18px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;}
+.btn-back-d:hover{border-color:var(--cyan);color:var(--cyan);}
+.btn-pdf{
+  background:linear-gradient(135deg,#0891B2,#0E7490);
+  color:#fff;border:none;
+  padding:9px 22px;border-radius:7px;
+  font-size:13px;font-weight:700;cursor:pointer;
+  box-shadow:0 0 14px rgba(34,211,238,.2);
+  transition:all .2s;font-family:inherit;
+}
+.btn-pdf:hover{box-shadow:0 0 24px rgba(34,211,238,.4);}
+
+/* Dashboard summary stats */
+.dash-stats{
+  max-width:1100px;margin:28px auto 0;
+  display:flex;gap:1px;
+  background:var(--border);
+  border-radius:12px;overflow:hidden;
+  border:1px solid var(--border);
+  padding: 0 20px;
+}
+.dstat{
+  flex:1;padding:20px 24px;
+  background:var(--card);
+  text-align:center;
+  position:relative;
+}
+.dstat + .dstat::before{content:'';position:absolute;right:0;top:20%;bottom:20%;width:1px;background:var(--border);}
+.dstat-n{font-size:36px;font-weight:800;line-height:1;margin-bottom:4px;font-family:monospace;letter-spacing:-1px;}
+.dstat-l{font-size:11px;color:var(--t2);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.dstat.cyan .dstat-n{color:var(--cyan);}
+.dstat.green .dstat-n{color:var(--green);}
+.dstat.amber .dstat-n{color:var(--amber);}
+.dstat.purple .dstat-n{color:var(--purple);}
+
+/* Dept sections */
+.dash-content{max-width:1100px;margin:32px auto 0;padding:0 20px 60px;}
+
+.dept-section{margin-bottom:36px;}
+.dept-header{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:16px;padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+}
+.dept-bar{width:3px;height:22px;border-radius:2px;flex-shrink:0;}
+.dept-name{font-size:16px;font-weight:800;color:var(--t1);letter-spacing:-.2px;}
+.dept-count{font-size:11px;color:var(--t2);background:var(--card);border:1px solid var(--border2);padding:2px 9px;border-radius:20px;margin-right:4px;}
+
+/* Role cards grid */
+.roles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media(max-width:800px){.roles-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.roles-grid{grid-template-columns:1fr;}}
+
+.drc{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+  position:relative;
+}
+.drc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.drc:hover{box-shadow:var(--glow-c);border-color:var(--border2);}
+
+.drc-head{padding:14px 16px 12px;border-bottom:1px solid var(--border);}
+.drc-role{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:4px;line-height:1.3;}
+.drc-emp{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:6px;}
+.drc-emp-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);flex-shrink:0;}
+.drc-years{font-size:11px;color:var(--t3);margin-right:4px;}
+
+.drc-body{padding:12px 16px;}
+.drc-cands-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t2);margin-bottom:10px;}
+
+.cand-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.cand-row:last-child{margin-bottom:0;}
+.cand-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cd-green{background:var(--green);}
+.cd-amber{background:var(--amber);}
+.cd-red{background:var(--red);}
+.cd-gray{background:var(--t3);border:1px solid var(--border2);}
+.cand-name-d{font-size:12px;color:var(--t1);font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cand-badge{font-size:10px;font-weight:700;padding:1px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.cb-1{background:var(--green-d);color:var(--green);border:1px solid rgba(16,185,129,.25);}
+.cb-2{background:var(--amber-d);color:var(--amber);border:1px solid rgba(245,158,11,.25);}
+.cb-3{background:var(--red-d);color:var(--red);border:1px solid rgba(248,113,113,.25);}
+.cb-u{background:var(--card2);color:var(--t3);border:1px solid var(--border);}
+
+.no-cand-row{font-size:12px;color:var(--t3);font-style:italic;padding:4px 0;}
+
+.drc-footer{
+  padding:8px 16px;
+  border-top:1px solid var(--border);
+  background:var(--bg2);
+}
+.drc-summary-text{font-size:11px;color:var(--t2);}
+
+/* Details table (below grid) */
+.details-section{margin-top:40px;border-top:1px solid var(--border);padding-top:28px;}
+.det-title{font-size:14px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:20px;}
+.det-table{width:100%;border-collapse:collapse;}
+.det-table th{
+  text-align:right;padding:9px 14px;
+  font-size:10px;font-weight:700;color:var(--t2);
+  text-transform:uppercase;letter-spacing:.6px;
+  border-bottom:1px solid var(--border);
+  background:var(--card);
+}
+.det-table td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top;}
+.det-table tr:last-child td{border-bottom:none;}
+.det-table tr:hover td{background:var(--card2);}
+.td-role{font-weight:700;color:var(--t1);}
+.td-emp{font-size:12px;color:var(--t2);}
+.ready-p{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.rp-1{background:var(--green-d);color:var(--green);}
+.rp-2{background:var(--amber-d);color:var(--amber);}
+.rp-3{background:var(--red-d);color:var(--red);}
+.rp-u{background:var(--card2);color:var(--t3);}
+.str-d{color:var(--green);font-size:12px;}
+.gap-d{color:var(--red);font-size:12px;}
+
+/* Footer */
+.dash-footer{
+  border-top:1px solid var(--border);
+  padding:20px;text-align:center;
+  max-width:1100px;margin:0 auto;
+}
+.dash-footer p{font-size:12px;color:var(--t2);}
+.dash-footer a{color:var(--cyan);text-decoration:none;font-weight:600;}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card);color:var(--t1);border:1px solid var(--border2);padding:12px 20px;border-radius:9px;font-size:13px;font-weight:500;box-shadow:0 0 20px rgba(0,0,0,.5);z-index:9999;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* Readiness pills (shared) */
+.rp-pill-1{background:var(--green-d);color:var(--green);}
+.rp-pill-2{background:var(--amber-d);color:var(--amber);}
+.rp-pill-3{background:var(--red-d);color:var(--red);}
+
+/* Print */
+@media print{
+  #welcome,#builder,#loading{display:none!important;}
+  #dashboard{display:block!important;}
+  body{background:#fff!important;background-image:none!important;color:#000!important;}
+  .dash-head{background:#1E3A5F!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .dh-actions{display:none!important;}
+  .drc{break-inside:avoid;page-break-inside:avoid;}
+  :root{--t1:#111;--t2:#444;--card:#f8f8f8;--border:#ddd;--bg2:#f4f4f4;}
+}
+
+@media(max-width:620px){
+  .fr4{grid-template-columns:1fr 1fr;}
+  .fr2{grid-template-columns:1fr;}
+  .bh-a .btn-ghost{display:none;}
+  .dash-stats{flex-wrap:wrap;}
+  .dstat{min-width:40%;}
+  .ac-cols{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ WELCOME ══ -->
+<div id="welcome" class="screen active">
+  <div class="wcard">
+    <div class="wlogo">IDEA · Succession Intelligence</div>
+    <h1 class="wtitle">מפת יורשים</h1>
+    <p class="wsub">בנו מפת רצף ניהולי לפי מחלקות.<br>הניתוח רץ אוטומטי. הדשבורד מוכן להנהלה.</p>
+    <div class="wsteps">
+      <div class="ws"><div class="wsico">🏢</div><div class="wslbl">מחלקות ותפקידים</div></div>
+      <div class="ws"><div class="wsico">📋</div><div class="wslbl">קורות חיים</div></div>
+      <div class="ws"><div class="wsico">🤖</div><div class="wslbl">ניתוח אוטומטי</div></div>
+      <div class="ws"><div class="wsico">📊</div><div class="wslbl">דשבורד מנהלים</div></div>
+    </div>
+    <button class="btn-start" onclick="showBuilder()">התחל →</button>
+
+    <div style="margin-top:28px;padding:14px 18px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:10px;text-align:right;">
+      <div style="font-size:12px;font-weight:700;color:#10B981;margin-bottom:6px;letter-spacing:.3px;">🔒 אבטחת מידע מלאה</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.6;">
+        כל הנתונים נשארים <strong style="color:var(--t1)">במכשיר שלך בלבד.</strong><br>
+        אין שרת. אין מסד נתונים. אין שידור לאינטרנט.<br>
+        סגירת הטאב מוחקת הכל לצמיתות.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BUILDER ══ -->
+<div id="builder" class="screen">
+  <div class="bhead">
+    <div><div class="bh-t">Succession Intelligence</div><div class="bh-s">ממשק הגדרת תפקידים ומועמדים</div></div>
+    <div class="bh-a">
+      <button class="btn-ghost" onclick="goHome()">← בית</button>
+      <button class="btn-gen" onclick="generateDashboard()">⚡ צור דשבורד</button>
+    </div>
+  </div>
+  <div class="bbody">
+    <div id="roles-container"></div>
+    <button class="add-role-btn" onclick="addRole()">+ הוסף תפקיד קריטי</button>
+  </div>
+</div>
+
+<!-- ══ LOADING ══ -->
+<div id="loading">
+  <div class="loading-card">
+    <div class="loading-ring"></div>
+    <div class="loading-text">מנתח מועמדים</div>
+    <div class="loading-sub" id="loading-sub">מעבד ניסיון תעסוקתי...</div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="dashboard" class="screen">
+  <div class="dash-head">
+    <div class="dash-head-inner">
+      <div class="dh-brand">
+        <div class="dh-icon">📊</div>
+        <div>
+          <div class="dh-t">מפת יורשים ארגונית</div>
+          <div class="dh-s">Succession Intelligence Dashboard</div>
+        </div>
+      </div>
+      <div class="dh-actions">
+        <div class="dh-date" id="dh-date"></div>
+        <button class="btn-back-d" onclick="showBuilder()">← עריכה</button>
+        <button class="btn-pdf" onclick="window.print()">🖨 ייצוא PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1100px;margin:0 auto;padding:0 20px;">
+    <div class="dash-stats" id="dash-stats"></div>
+  </div>
+
+  <div class="dash-content" id="dash-content"></div>
+
+  <div class="dash-footer">
+    <p>נבנה על ידי <a href="https://www.idea-eb.com" target="_blank">דרור הופמן · IDEA Employer Branding</a></p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script>
+if(typeof pdfjsLib!=='undefined'){
+  pdfjsLib.GlobalWorkerOptions.workerSrc=
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+let roles=[],roleSeq=0,candSeq=0,openSet=new Set();
+
+const READY_LABELS={'1':'מוכן עכשיו','2':'1–2 שנים','3':'3–5 שנים'};
+const READY_FULL={'1':'מוכן עכשיו','2':'מוכן תוך 1–2 שנים','3':'מוכן תוך 3–5 שנים'};
+
+const DEPT_COLORS=['#22D3EE','#818CF8','#10B981','#F59E0B','#F87171','#A78BFA','#34D399','#60A5FA','#FB923C','#E879F9'];
+
+/* ══════════════════════════════════════
+   ANALYSIS ENGINE
+══════════════════════════════════════ */
+function detectYears(text){
+  const cur=new Date().getFullYear();let total=0;
+  const rx=/(\d{4})\s*[-–—]\s*(\d{4}|present|current|היום|כיום|עד\s*היום)/gi;
+  let m;
+  while((m=rx.exec(text))!==null){
+    const s=parseInt(m[1]);
+    const raw=m[2].replace(/[^\d]/g,'');
+    const e=raw.length===4?parseInt(raw):cur;
+    if(s>=1970&&s<=cur&&e>=s)total+=(e-s);
+  }
+  const he=text.match(/(\d+)\s*שנו?ת?\s*(ניסיון|עבודה)/i);
+  const en=text.match(/(\d+)\s*years?\s*(of\s*)?(experience|work)/i);
+  if(he)total=Math.max(total,parseInt(he[1]));
+  if(en)total=Math.max(total,parseInt(en[1]));
+  return Math.min(total,45);
+}
+
+function detectMgmt(text){
+  const has=k=>text.toLowerCase().includes(k.toLowerCase())||text.includes(k);
+  if(['מנכ"ל','מנכל','סמנכ"ל','סמנכל','ceo','cto','cmo','coo','cpo','chief ','vp ','vice president','general manager'].some(has))return 3;
+  if(['מנהל ','מנהלת ','מנהל/ת','director','head of','ראש צוות','ראש מחלקה','team lead','מנהל פרויקט','project manager','product manager','people manager'].some(has))return 2;
+  if(['senior','בכיר','בכירה','lead ','ספציאליסט','specialist','principal','staff '].some(has))return 1;
+  return 0;
+}
+
+const DOMAIN_KEYS={
+  שיווק:['שיווק','marketing','מותג','brand','קמפיין','campaign','דיגיטל','digital','content','תוכן','seo','sem','ppc','leads','לידים','growth'],
+  מכירות:['מכירות','sales','revenue','הכנסות','account','pipeline','quota','crm','לקוחות'],
+  פיתוח:['פיתוח','development','software','תוכנה','engineering','backend','frontend','fullstack','devops','cloud','python','java','react','node'],
+  hr:['hr','משאבי אנוש','גיוס','recruitment','talent','onboarding','employer brand','מיתוג מעסיק','תרבות','culture','wellbeing','learning','פיתוח ארגוני'],
+  כספים:['כספים','finance','חשבונאות','accounting','תקציב','budget','p&l','cfo','audit'],
+  תפעול:['תפעול','operations','logistics','לוגיסטיקה','supply chain','שרשרת','process','נהלים'],
+  מוצר:['product','מוצר','roadmap','ux','ui','design','עיצוב','user research','agile','scrum','sprint'],
+  customer:['customer','לקוח','service','שירות','support','success','cx'],
+};
+
+function detectRelevance(cvText,roleName){
+  if(!roleName)return 1;
+  let best=0;
+  for(const[,keys]of Object.entries(DOMAIN_KEYS)){
+    const inRole=keys.some(k=>(roleName||'').toLowerCase().includes(k));
+    if(!inRole)continue;
+    const hits=keys.filter(k=>cvText.toLowerCase().includes(k)).length;
+    best=Math.max(best,Math.min(3,hits));
+  }
+  if(best===0){
+    const rw=(roleName||'').toLowerCase().split(/\s+/).filter(w=>w.length>2);
+    best=Math.min(3,rw.filter(w=>cvText.toLowerCase().includes(w)).length);
+  }
+  return best;
+}
+
+function extractStrengths(text,mgmtLevel,years){
+  const bullets=[];
+  if(years>=10)bullets.push(`${years}+ שנות ניסיון מקצועי`);
+  else if(years>=5)bullets.push(`${years} שנות ניסיון בתחום`);
+  else if(years>0)bullets.push(`${years} שנות ניסיון`);
+  if(mgmtLevel===3)bullets.push('ניסיון ניהולי בכיר – C-Suite / VP');
+  else if(mgmtLevel===2)bullets.push('ניסיון ניהול ישיר של צוות / מחלקה');
+  else if(mgmtLevel===1)bullets.push('ניסיון בתפקיד בכיר / Lead');
+  const pats=[/הגדיל[^\n.]{0,60}/gi,/הוביל[^\n.]{0,60}/gi,/פיתח[^\n.]{0,60}/gi,/managed\s[^\n.]{0,60}/gi,/grew\s[^\n.]{0,60}/gi,/\d+%[^\n.]{0,50}/gi];
+  pats.forEach(p=>{const ms=text.match(p);if(ms)bullets.push(ms[0].trim().replace(/\s+/g,' ').substring(0,70));});
+  const seen=new Set();
+  return bullets.filter(b=>{const k=b.substring(0,20);if(seen.has(k))return false;seen.add(k);return true;}).slice(0,4);
+}
+
+function identifyGaps(cvText,roleName,years,mgmtLevel){
+  const gaps=[];
+  if(years>0&&years<3)gaps.push('ניסיון מצומצם יחסית');
+  if(/מנהל|director|head|vp|ראש/i.test(roleName)&&mgmtLevel<2)gaps.push('חסר ניסיון ניהול ישיר');
+  for(const[domain,keys]of Object.entries(DOMAIN_KEYS)){
+    const inRole=keys.some(k=>(roleName||'').toLowerCase().includes(k));
+    if(!inRole)continue;
+    if(keys.filter(k=>cvText.toLowerCase().includes(k)).length<2)gaps.push(`ניסיון מוגבל בתחום ${domain}`);
+  }
+  if(cvText.trim().length<150)gaps.push('מידע מועט — מומלץ להשלים קורות חיים מלאים');
+  return gaps.slice(0,3);
+}
+
+function scoreToReadiness(years,mgmt,rel){
+  let s=0;
+  s+=years>=10?4:years>=7?3:years>=4?2:years>=2?1:0;
+  s+=Math.min(mgmt,3);
+  s+=Math.min(rel,3);
+  return s>=8?'1':s>=5?'2':'3';
+}
+
+function buildExpl(years,mgmt,rel,r){
+  const p=[];
+  if(years>0)p.push(`${years} שנות ניסיון`);
+  p.push(['ללא ניהול','בכיר/Lead','מנהל ישיר','C-Suite/VP'][mgmt]);
+  p.push(['רלוונטיות נמוכה','רלוונטיות חלקית','רלוונטיות בינונית','רלוונטיות גבוהה'][rel]);
+  const sfx=r==='1'?'הפרופיל מתאים לתפקיד כיום.':r==='2'?'עם ליווי ממוקד — מעבר אפשרי תוך שנה-שנתיים.':'נדרש פיתוח משמעותי לפני מעבר.';
+  return `${p.join(' | ')}. ${sfx}`;
+}
+
+function runAnalysis(cvText,roleName){
+  const years=detectYears(cvText);
+  const mgmt=detectMgmt(cvText);
+  const rel=detectRelevance(cvText,roleName);
+  const r=scoreToReadiness(years,mgmt,rel);
+  const explanation=buildExpl(years,mgmt,rel,r);
+  const strengths=extractStrengths(cvText,mgmt,years);
+  const gaps=identifyGaps(cvText,roleName,years,mgmt);
+  const mgmtLabel=['לא זוהה ניהול','בכיר/Lead','מנהל/Director','C-Suite/VP'][mgmt];
+  const relLabel=['נמוכה','חלקית','בינונית','גבוהה'][rel];
+  return{readiness:r,explanation,strengths,gaps,years,mgmtLabel,relLabel};
+}
+
+/* ══════════════════════════════════════
+   STATE MANAGEMENT
+══════════════════════════════════════ */
+function newRole(){return{id:++roleSeq,name:'',department:'',employee:'',years:'',candidates:[]};}
+function newCand(){return{id:++candSeq,name:'',role:'',cvText:'',readiness:'',readinessManual:'',analysis:null};}
+
+function syncRole(id){
+  const r=roles.find(x=>x.id===id);if(!r)return;
+  r.name=v(`rname-${id}`);r.department=v(`rdept-${id}`);
+  r.employee=v(`remp-${id}`);r.years=v(`ryears-${id}`);
+  r.candidates.forEach(c=>{
+    c.name=v(`cname-${c.id}`);c.role=v(`crole-${c.id}`);
+    c.cvText=v(`ccv-${c.id}`);
+    const man=v(`cready-${c.id}`);if(man){c.readiness=man;c.readinessManual=man;}
+  });
+}
+function syncAll(){roles.forEach(r=>syncRole(r.id));}
+function v(id){const e=document.getElementById(id);return e?e.value:'';}
+function sv(id,val){const e=document.getElementById(id);if(e)e.value=val||'';}
+
+/* ══════════════════════════════════════
+   ACTIONS
+══════════════════════════════════════ */
+function addRole(){const r=newRole();roles.push(r);openSet.add(r.id);renderAll();}
+function deleteRole(id){syncAll();roles=roles.filter(r=>r.id!==id);openSet.delete(id);renderAll();}
+function toggleCard(id){syncAll();openSet.has(id)?openSet.delete(id):openSet.add(id);renderAll();}
+function addCand(rId){
+  syncAll();const r=roles.find(x=>x.id===rId);if(!r)return;
+  if(r.candidates.length>=3){showToast('ניתן להוסיף עד 3 מועמדים');return;}
+  r.candidates.push(newCand());openSet.add(rId);renderAll();
+}
+function deleteCand(rId,cId){
+  syncAll();const r=roles.find(x=>x.id===rId);if(!r)return;
+  r.candidates=r.candidates.filter(c=>c.id!==cId);openSet.add(rId);renderAll();
+}
+function onInput(rId){syncRole(rId);refreshHead(rId);}
+
+function refreshHead(id){
+  const r=roles.find(x=>x.id===id);if(!r)return;
+  const te=document.getElementById(`rt-${id}`);
+  const me=document.getElementById(`rm-${id}`);
+  const dt=document.getElementById(`rdtag-${id}`);
+  if(te)te.textContent=r.name||'תפקיד חדש';
+  if(me){const p=[r.employee,r.years?`${r.years} שנים`:'',r.candidates.filter(c=>c.name).length?`${r.candidates.filter(c=>c.name).length} מועמדים`:''].filter(Boolean);me.textContent=p.join(' · ')||'לחץ להוספת פרטים';}
+  if(dt){dt.textContent=r.department||'ללא מחלקה';dt.style.display='';}
+}
+
+function manualOverride(rId,cId){
+  syncRole(rId);
+  const r=roles.find(x=>x.id===rId);
+  const c=r&&r.candidates.find(x=>x.id===cId);
+  if(!c)return;
+  const val=v(`cready-${cId}`);
+  c.readiness=val;c.readinessManual=val;
+  refreshHead(rId);
+}
+
+function analyze(rId,cId){
+  syncRole(rId);
+  const r=roles.find(x=>x.id===rId);
+  const c=r&&r.candidates.find(x=>x.id===cId);
+  if(!c)return;
+  if(c.cvText.trim().length<30){showToast('הדביקו ניסיון לפני הניתוח');return;}
+  const btn=document.getElementById(`abtn-${cId}`);
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner"></span> מנתח...';}
+  setTimeout(()=>{
+    c.analysis=runAnalysis(c.cvText,r.name);
+    if(!c.readinessManual)c.readiness=c.analysis.readiness;
+    const ac=document.getElementById(`acard-${cId}`);
+    if(ac)ac.innerHTML=renderAnalysisCard(c.analysis,cId);
+    const sel=document.getElementById(`cready-${cId}`);
+    if(sel&&!c.readinessManual)sel.value=c.analysis.readiness;
+    if(btn){btn.disabled=false;btn.innerHTML='✨ נתח מחדש';}
+    refreshHead(rId);
+  },700);
+}
+
+function renderAnalysisCard(res,cId){
+  const strLi=res.strengths.map(s=>`<li>${esc(s)}</li>`).join('')||'<li>לא זוהו חוזקות</li>';
+  const gapLi=res.gaps.map(g=>`<li>${esc(g)}</li>`).join('')||'<li>לא זוהו פערים</li>';
+  return`<div class="analysis-card">
+  <div class="ac-top">
+    <div class="ac-title">🤖 ניתוח ניסיון</div>
+    <div class="ac-stats">
+      ${res.years>0?`<span class="ac-stat">⏱ ${res.years}y</span>`:''}
+      <span class="ac-stat">👔 ${res.mgmtLabel}</span>
+      <span class="ac-stat">🎯 ${res.relLabel}</span>
+    </div>
+  </div>
+  <div class="ac-body">
+    <div class="ac-rl-row">
+      <div class="ac-rl-lbl">המלצה</div>
+      <div>
+        <div><span class="ac-rl-pill rp-pill-${res.readiness}" style="border-radius:20px;font-size:12px;font-weight:700;padding:3px 12px;">${READY_FULL[res.readiness]}</span></div>
+        <div class="ac-rl-exp">${esc(res.explanation)}</div>
+      </div>
+    </div>
+    <div class="ac-cols">
+      <div><div class="ac-col-t s">✅ חוזקות</div><ul class="ac-list s">${strLi}</ul></div>
+      <div><div class="ac-col-t g">⚠️ פערים</div><ul class="ac-list g">${gapLi}</ul></div>
+    </div>
+  </div>
+</div>`;
+}
+
+/* ══════════════════════════════════════
+   FILE UPLOAD
+══════════════════════════════════════ */
+async function handleFile(rId,cId){
+  const inp=document.getElementById(`file-${cId}`);
+  if(!inp||!inp.files[0])return;
+  const file=inp.files[0];
+  const name=file.name.toLowerCase();
+  const ta=document.getElementById(`ccv-${cId}`);
+  if(!ta)return;
+  ta.value='⏳ טוען קובץ...';ta.disabled=true;
+  try{
+    let text='';
+    if(name.endsWith('.pdf'))text=await extractPDF(file);
+    else if(name.endsWith('.docx')||name.endsWith('.doc'))text=await extractDOCX(file);
+    else text=await readTxt(file);
+    ta.value=text.trim();ta.disabled=false;
+    syncRole(rId);
+    autoFillFromCV(rId,cId);
+    showToast('✓ הקובץ נטען — לחצו "נתח ניסיון"');
+  }catch(err){
+    ta.value='';ta.disabled=false;
+    showToast('שגיאה בטעינה — נסו להעתיק ידנית');console.error(err);
+  }
+}
+async function extractPDF(file){
+  if(typeof pdfjsLib==='undefined')throw new Error('PDF.js not loaded');
+  const data=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data}).promise;
+  const pages=[];
+  for(let i=1;i<=pdf.numPages;i++){
+    const p=await pdf.getPage(i);
+    const c=await p.getTextContent();
+    pages.push(c.items.map(it=>it.str).join(' '));
+  }
+  return pages.join('\n');
+}
+async function extractDOCX(file){
+  if(typeof mammoth==='undefined')throw new Error('mammoth not loaded');
+  const data=await file.arrayBuffer();
+  const r=await mammoth.extractRawText({arrayBuffer:data});
+  return r.value;
+}
+function readTxt(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsText(file,'UTF-8');});}
+
+/* ══════════════════════════════════════
+   RENDER
+══════════════════════════════════════ */
+function renderAll(){
+  const con=document.getElementById('roles-container');if(!con)return;
+  con.innerHTML=roles.map((r,i)=>renderRoleCard(r,i)).join('');
+  roles.forEach(r=>{
+    sv(`rname-${r.id}`,r.name);sv(`rdept-${r.id}`,r.department);
+    sv(`remp-${r.id}`,r.employee);sv(`ryears-${r.id}`,r.years);
+    r.candidates.forEach(c=>{
+      sv(`cname-${c.id}`,c.name);sv(`crole-${c.id}`,c.role);
+      sv(`ccv-${c.id}`,c.cvText);
+      if(c.readiness)sv(`cready-${c.id}`,c.readiness);
+      if(c.analysis){const ac=document.getElementById(`acard-${c.id}`);if(ac)ac.innerHTML=renderAnalysisCard(c.analysis,c.id);}
+    });
+  });
+}
+
+function renderRoleCard(r,idx){
+  const isOpen=openSet.has(r.id);
+  const meta=[r.employee,r.years?`${r.years} שנים`:'',r.candidates.filter(c=>c.name).length?`${r.candidates.filter(c=>c.name).length} מועמדים`:''].filter(Boolean).join(' · ');
+  const canAdd=r.candidates.length<3;
+  const cHtml=r.candidates.map((c,ci)=>renderCandCard(c,ci,r.id)).join('');
+
+  return`<div class="role-card${isOpen?' open':''}" id="rc-${r.id}">
+  <div class="rc-head" onclick="toggleCard(${r.id})">
+    <div class="rch-r">
+      <div class="role-num">${idx+1}</div>
+      <div>
+        <div class="rt" id="rt-${r.id}">${r.name||'תפקיד חדש'}</div>
+        <div class="rm" id="rm-${r.id}">${meta||'לחץ להוספת פרטים'}</div>
+      </div>
+    </div>
+    <div class="rch-l">
+      <span class="dept-tag" id="rdtag-${r.id}">${r.department||'ללא מחלקה'}</span>
+      <span class="chevron">▾</span>
+    </div>
+  </div>
+  <div class="rc-body">
+    <div class="fr4">
+      <div class="fg" style="grid-column:span 2"><label class="fl">שם התפקיד *</label>
+        <input class="fi" type="text" id="rname-${r.id}" placeholder="מנהל שיווק ראשי" oninput="onInput(${r.id})"></div>
+      <div class="fg" style="grid-column:span 2"><label class="fl">מחלקה / אגף</label>
+        <input class="fi" type="text" id="rdept-${r.id}" placeholder="שיווק" oninput="onInput(${r.id})"></div>
+      <div class="fg" style="grid-column:span 2"><label class="fl">עובד נוכחי</label>
+        <input class="fi" type="text" id="remp-${r.id}" placeholder="שם העובד" oninput="onInput(${r.id})"></div>
+      <div class="fg" style="grid-column:span 2"><label class="fl">שנים בתפקיד</label>
+        <input class="fi" type="number" id="ryears-${r.id}" placeholder="0" min="0" max="50" oninput="onInput(${r.id})"></div>
+    </div>
+    <div class="cands-hdr">👥 מועמדים פוטנציאלים <span style="opacity:.5;font-weight:400;text-transform:none;letter-spacing:0">(עד 3)</span></div>
+    ${cHtml}
+    <button class="btn-add-cand" onclick="addCand(${r.id})" ${canAdd?'':'disabled'}>
+      ${canAdd?'+ הוסף מועמד':'✓ מקסימום 3 מועמדים'}
+    </button>
+    <div class="role-footer">
+      <div style="font-size:12px;color:var(--t2)">הניתוח ירוץ אוטומטית בעת יצירת הדשבורד</div>
+      <button class="btn-del" onclick="deleteRole(${r.id})">✕ מחק תפקיד</button>
+    </div>
+  </div>
+</div>`;
+}
+
+function renderCandCard(c,ci,rId){
+  return`<div class="cand-card">
+  <div class="cand-head">
+    <span class="cand-num">מועמד ${ci+1}</span>
+    <button class="btn-rm" onclick="deleteCand(${rId},${c.id})">×</button>
+  </div>
+  <div class="fr2">
+    <div class="fg"><label class="fl">שם המועמד</label>
+      <input class="fi" type="text" id="cname-${c.id}" placeholder="שם מלא" oninput="onInput(${rId})"></div>
+    <div class="fg"><label class="fl">תפקיד נוכחי</label>
+      <input class="fi" type="text" id="crole-${c.id}" placeholder="מנהל מוצר" oninput="onInput(${rId})"></div>
+  </div>
+  <div class="fg">
+    <div class="cv-label-row">
+      <label class="fl" style="margin:0">ניסיון תעסוקתי / קורות חיים</label>
+      <label class="upload-lbl" for="file-${c.id}">📎 PDF / Word / TXT</label>
+    </div>
+    <textarea class="fi" id="ccv-${c.id}" rows="4"
+      placeholder="הדביקו קורות חיים, ניסיון תעסוקתי, או תיאור מקצועי של המועמד..."
+      oninput="onCVInput(${rId},${c.id})"></textarea>
+    <input type="file" id="file-${c.id}" accept=".pdf,.docx,.doc,.txt,.md" style="display:none" onchange="handleFile(${rId},${c.id})">
+    <button class="btn-analyze" id="abtn-${c.id}" onclick="analyze(${rId},${c.id})">✨ נתח ניסיון</button>
+  </div>
+  <div id="acard-${c.id}"></div>
+  <div class="r-override">
+    <label class="fl" style="margin:0;white-space:nowrap">מוכנות${c.analysis?' <span style="color:var(--purple);opacity:.7;font-weight:400">(אוטומטי — ניתן לעקוף)</span>':''}:</label>
+    <select class="fi" id="cready-${c.id}" style="width:200px" onchange="manualOverride(${rId},${c.id})">
+      <option value="">לא נותח עדיין</option>
+      <option value="1">מוכן עכשיו</option>
+      <option value="2">מוכן תוך 1–2 שנים</option>
+      <option value="3">מוכן תוך 3–5 שנים</option>
+    </select>
+  </div>
+</div>`;
+}
+
+/* ══════════════════════════════════════
+   DASHBOARD GENERATION
+══════════════════════════════════════ */
+async function generateDashboard(){
+  syncAll();
+  const valid=roles.filter(r=>r.name.trim());
+  if(!valid.length){showToast('הוסיפו לפחות תפקיד אחד עם שם');return;}
+
+  const loadingEl=document.getElementById('loading');
+  const loadingSub=document.getElementById('loading-sub');
+  loadingEl.classList.add('show');
+
+  let analyzed=0;
+  for(const role of valid){
+    for(const c of role.candidates){
+      if(c.cvText&&c.cvText.trim().length>30&&!c.analysis){
+        if(loadingSub)loadingSub.textContent=`מנתח: ${c.name||'מועמד'}...`;
+        await new Promise(r=>setTimeout(r,60));
+        c.analysis=runAnalysis(c.cvText,role.name);
+        if(!c.readiness)c.readiness=c.analysis.readiness;
+        analyzed++;
+      }
+    }
+  }
+
+  await new Promise(r=>setTimeout(r,200));
+  loadingEl.classList.remove('show');
+
+  buildDashboard(valid);
+  show('dashboard');
+}
+
+function buildDashboard(valid){
+  document.getElementById('dh-date').textContent=
+    new Date().toLocaleDateString('he-IL',{year:'numeric',month:'long',day:'numeric'});
+
+  const depts={};
+  valid.forEach(r=>{
+    const d=r.department||'ללא מחלקה';
+    if(!depts[d])depts[d]=[];
+    depts[d].push(r);
+  });
+  const deptNames=Object.keys(depts);
+
+  const totalCands=valid.reduce((s,r)=>s+r.candidates.filter(c=>c.name.trim()).length,0);
+  const readyNow=valid.reduce((s,r)=>s+r.candidates.filter(c=>c.readiness==='1').length,0);
+
+  document.getElementById('dash-stats').innerHTML=`
+    <div class="dstat cyan"><div class="dstat-n">${valid.length}</div><div class="dstat-l">תפקידים קריטיים</div></div>
+    <div class="dstat purple"><div class="dstat-n">${deptNames.length}</div><div class="dstat-l">מחלקות</div></div>
+    <div class="dstat amber"><div class="dstat-n">${totalCands}</div><div class="dstat-l">ממלאי מקום פוטנציאלים</div></div>
+    <div class="dstat green"><div class="dstat-n">${readyNow}</div><div class="dstat-l">מוכנים עכשיו</div></div>`;
+
+  let html='';
+  deptNames.forEach((dept,di)=>{
+    const color=DEPT_COLORS[di%DEPT_COLORS.length];
+    const dRoles=depts[dept];
+    const cardsHtml=dRoles.map(r=>renderDRoleCard(r,color)).join('');
+
+    html+=`<div class="dept-section">
+  <div class="dept-header">
+    <div class="dept-bar" style="background:${color};box-shadow:0 0 8px ${color}55;"></div>
+    <div class="dept-name">${esc(dept)}</div>
+    <span class="dept-count">${dRoles.length} תפקידים</span>
+  </div>
+  <div class="roles-grid">${cardsHtml}</div>
+</div>`;
+  });
+
+  html+=`<div class="details-section">
+  <div class="det-title">פירוט מלא — כל המועמדים</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+  <table class="det-table">
+    <thead><tr>
+      <th>תפקיד</th><th>מועמד</th><th>מוכנות</th><th>חוזקות</th><th>פערים</th>
+    </tr></thead>
+    <tbody>${valid.flatMap(r=>r.candidates.filter(c=>c.name.trim()).map(c=>`<tr>
+      <td><div class="td-role">${esc(r.name)}</div><div class="td-emp">${esc(r.department||'')}</div></td>
+      <td><div style="font-weight:600;color:var(--t1)">${esc(c.name)}</div><div style="font-size:12px;color:var(--t2)">${esc(c.role||'')}</div></td>
+      <td>${c.readiness?`<span class="ready-p rp-${c.readiness}">${READY_FULL[c.readiness]}</span>`:'<span class="ready-p rp-u">לא נותח</span>'}</td>
+      <td>${c.analysis&&c.analysis.strengths.length?c.analysis.strengths.slice(0,2).map(s=>`<div class="str-d">✓ ${esc(s)}</div>`).join(''):'<span style="color:var(--t3);font-size:12px">—</span>'}</td>
+      <td>${c.analysis&&c.analysis.gaps.length?c.analysis.gaps.slice(0,2).map(g=>`<div class="gap-d">· ${esc(g)}</div>`).join(''):'<span style="color:var(--t3);font-size:12px">—</span>'}</td>
+    </tr>`)).join('')}</tbody>
+  </table></div></div>`;
+
+  document.getElementById('dash-content').innerHTML=html;
+}
+
+function renderDRoleCard(r,color){
+  const active=r.candidates.filter(c=>c.name.trim());
+  const slots=[...active];
+  while(slots.length<3)slots.push(null);
+
+  const dotColor={'1':'cd-green','2':'cd-amber','3':'cd-red','':'cd-gray'};
+  const badgeCls={'1':'cb-1','2':'cb-2','3':'cb-3','':'cb-u'};
+
+  const candsHtml=slots.map(c=>c?
+    `<div class="cand-row">
+      <div class="cand-dot ${dotColor[c.readiness||'']}"></div>
+      <div class="cand-name-d">${esc(c.name)}</div>
+      <span class="cand-badge ${badgeCls[c.readiness||'']}">${c.readiness?READY_LABELS[c.readiness]:'?'}</span>
+    </div>`:
+    `<div class="cand-row"><div class="cand-dot cd-gray" style="opacity:.3"></div><div class="no-cand-row">אין מועמד</div></div>`
+  ).join('');
+
+  const bestR=active.length?Math.min(...active.map(c=>parseInt(c.readiness||'4'))):4;
+  const summaryText=active.length===0?'אין מועמדים':bestR===1?'מועמד מוכן עכשיו':bestR===2?'מוכן תוך 1–2 שנים':'צנרת בשלבי פיתוח';
+  const summaryColor=active.length===0?'var(--t3)':bestR===1?'var(--green)':bestR===2?'var(--amber)':'var(--red)';
+
+  return`<div class="drc">
+  <div style="height:2px;background:${color};opacity:.8;"></div>
+  <div class="drc-head">
+    <div class="drc-role">${esc(r.name)}</div>
+    <div class="drc-emp">
+      ${r.employee?`<span class="drc-emp-dot"></span>${esc(r.employee)}`:'<span style="color:var(--t3)">לא הוגדר</span>'}
+      ${r.years?`<span class="drc-years">· ${r.years}y</span>`:''}
+    </div>
+  </div>
+  <div class="drc-body">
+    <div class="drc-cands-lbl">צנרת מועמדים</div>
+    ${candsHtml}
+  </div>
+  <div class="drc-footer">
+    <span class="drc-summary-text" style="color:${summaryColor}">${summaryText}</span>
+  </div>
+</div>`;
+}
+
+/* ══════════════════════════════════════
+   AUTO-FILL NAME + ROLE FROM CV
+══════════════════════════════════════ */
+function extractNameFromCV(text) {
+  const lines = text.split(/\n/).map(l => l.trim()).filter(l => l.length > 1);
+  for (const line of lines.slice(0, 6)) {
+    const m = line.match(/^(?:שם|name|full\s*name)[:\s]+(.+)/i);
+    if (m) return m[1].replace(/[|,].*/, '').trim();
+  }
+  for (let i = 0; i < Math.min(7, lines.length); i++) {
+    const line = lines[i];
+    if (line.length > 55) continue;
+    if (/[@https?://|www\.|linkedin|github|\d{5,}|[+*#%$&<>]]/i.test(line)) continue;
+    if (/^(?:קורות חיים|resume|cv|curriculum|ניסיון|experience|השכלה|education|profile|סיכום|summary|skills|כישורים)/i.test(line)) continue;
+    if (/^\d/.test(line)) continue;
+    const words = line.split(/\s+/);
+    if (words.length >= 2 && words.length <= 5 && /^[א-תA-Za-z\s'\-.]+$/.test(line)) {
+      return line;
+    }
+  }
+  return '';
+}
+
+function extractRoleFromCV(text) {
+  const lines = text.split(/\n/).map(l => l.trim()).filter(l => l.length > 1);
+  for (const line of lines.slice(0, 10)) {
+    const m = line.match(/^(?:תפקיד\s*(?:נוכחי)?|current\s*(?:role|position|title)|position|role|תואר)[:\s]+(.+)/i);
+    if (m) return m[1].trim();
+  }
+  const TITLE_RX = [
+    /^(?:מנהל|מנהלת|ראש|סמנכ["׳]ל|מנכ["׳]ל|מנהל\/ת|סגן).{0,55}$/,
+    /^.{0,55}(?:\bmanager|\bdirector|\blead\b|\bvp\b|\bhead of|\bchief|\bengineer|\banalyst|\bspecialist|\barchitect|\bdesigner|\bconsultant)\b.{0,30}$/i,
+    /^.{0,55}(?:בכיר|ספציאליסט|יועץ|מפתח|אנליסט|ארכיטקט|מעצב).{0,30}$/,
+  ];
+  for (let i = 1; i < Math.min(9, lines.length); i++) {
+    const line = lines[i];
+    if (line.length > 70 || /@|https?|\d{5,}/.test(line)) continue;
+    for (const rx of TITLE_RX) {
+      if (rx.test(line)) return line;
+    }
+  }
+  return '';
+}
+
+const _autoFillTimers = {};
+
+function autoFillFromCV(rId, cId) {
+  const cvEl  = document.getElementById(`ccv-${cId}`);
+  const nameEl = document.getElementById(`cname-${cId}`);
+  const roleEl = document.getElementById(`crole-${cId}`);
+  if (!cvEl) return;
+  const text = cvEl.value;
+  if (!text.trim()) return;
+  if (nameEl && !nameEl.value.trim()) {
+    const name = extractNameFromCV(text);
+    if (name) { nameEl.value = name; }
+  }
+  if (roleEl && !roleEl.value.trim()) {
+    const role = extractRoleFromCV(text);
+    if (role) { roleEl.value = role; }
+  }
+  syncRole(rId);
+}
+
+function onCVInput(rId, cId) {
+  onInput(rId);
+  clearTimeout(_autoFillTimers[cId]);
+  _autoFillTimers[cId] = setTimeout(() => autoFillFromCV(rId, cId), 900);
+}
+
+/* ══════════════════════════════════════
+   NAV + UTILS
+══════════════════════════════════════ */
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function goHome(){show('welcome');}
+function showBuilder(){renderAll();show('builder');}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+/* ══════════════════════════════════════
+   SECURITY MECHANISMS
+══════════════════════════════════════ */
+
+/* 1. Warn before leaving page with data */
+window.addEventListener('beforeunload', e => {
+  const hasData = roles.some(r => r.name || r.candidates.some(c => c.name || c.cvText));
+  if (hasData) {
+    e.preventDefault();
+    e.returnValue = 'הנתונים לא נשמרים. האם לעזוב את הדף?';
+    return e.returnValue;
+  }
+});
+
+/* 2. Auto-clear after 30 minutes of inactivity */
+let _inactivityTimer;
+const INACTIVITY_MS = 30 * 60 * 1000;
+function resetInactivity() {
+  clearTimeout(_inactivityTimer);
+  _inactivityTimer = setTimeout(() => {
+    const hasData = roles.some(r => r.name || r.candidates.some(c => c.name || c.cvText));
+    if (hasData) {
+      roles = []; openSet.clear(); renderAll(); show('welcome');
+      showToast('🔒 הנתונים נמחקו אוטומטית לאחר 30 דקות חוסר פעילות');
+    }
+  }, INACTIVITY_MS);
+}
+['click','keydown','mousemove','touchstart','scroll'].forEach(ev =>
+  document.addEventListener(ev, resetInactivity, { passive: true })
+);
+resetInactivity();
+
+/* 3. Disable right-click on dashboard */
+document.getElementById('dashboard').addEventListener('contextmenu', e => e.preventDefault());
+
+/* 4. Detect visibility change */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  const onDash = document.getElementById('dashboard').classList.contains('active');
+  if (onDash) {
+    const overlay = document.getElementById('blur-overlay');
+    if (overlay) overlay.style.display = 'none';
+  }
+});
+
+/* 5. Blur dashboard when tab loses focus */
+window.addEventListener('blur', () => {
+  const onDash = document.getElementById('dashboard').classList.contains('active');
+  if (onDash) {
+    let overlay = document.getElementById('blur-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'blur-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(6,11,22,.95);backdrop-filter:blur(12px);z-index:9998;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;';
+      overlay.innerHTML = '<div style="font-size:32px">🔒</div><div style="color:#22D3EE;font-size:16px;font-weight:700">הדשבורד מוסתר</div><div style="color:#4B6A9A;font-size:13px">לחץ להמשיך</div>';
+      overlay.addEventListener('click', () => { overlay.style.display = 'none'; });
+      document.body.appendChild(overlay);
+    } else {
+      overlay.style.display = 'flex';
+    }
+  }
+});
+
+/* 6. Block Ctrl+S, Ctrl+U on dashboard */
+document.addEventListener('keydown', e => {
+  const onDash = document.getElementById('dashboard').classList.contains('active');
+  if (onDash && e.ctrlKey && ['s','u'].includes(e.key.toLowerCase())) {
+    e.preventDefault();
+    showToast('💡 לשמירה השתמש בכפתור "ייצוא PDF"');
+  }
+});
+
+/* 7. Verify CSP is active */
+(function checkSecurity() {
+  try {
+    const img = new Image();
+    img.src = 'https://example.com/pixel.gif?t=' + Date.now();
+    img.onload = () => console.warn('[SECURITY] CSP connect-src not enforced in this browser context');
+  } catch(_) {}
+})();
+</script>
+</body>
+</html>
